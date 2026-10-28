@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_product_category_name_translation
+    description: >
+      Portuguese to English category names. Two categories in the products table
+      are missing here (pc_gamer, portateis_cozinha_e_preparadores_de_alimentos);
+      the product_category_english macro fills them in.
+    columns:
+      - name: product_category_name
+        tests: [unique, not_null]
+      - name: product_category_name_english
+        tests: [not_null]

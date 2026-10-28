@@ -1,0 +1,122 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: >
+      One row per person (customer_unique_id). Lifetime figures use qualifying
+      orders only. People with no qualifying order are kept, with
+      has_qualifying_order = false, so every order in fct_orders has a customer.
+    columns:
+      - name: customer_unique_id
+        tests: [unique, not_null]
+      - name: customer_region
+        description: Macro-region from the brazil_state_regions seed.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [North, Northeast, Central-West, Southeast, South]
+      - name: first_order_date
+      - name: first_order_category
+      - name: is_repeat_buyer
+        tests: [not_null]
+      - name: lifetime_orders
+      - name: lifetime_value
+        description: Sum of qualifying order values, R$.
+
+  - name: dim_products
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+      - name: product_category
+        tests: [not_null]
+
+  - name: dim_sellers
+    description: One row per seller with its delivery and review record over qualifying orders.
+    columns:
+      - name: seller_id
+        tests: [unique, not_null]
+      - name: seller_region
+      - name: avg_review_score
+      - name: late_delivery_rate
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: total_gmv
+
+  - name: dim_date
+    description: Calendar spine. Weeks start on Monday.
+    columns:
+      - name: date_day
+        tests: [unique, not_null]
+
+  - name: fct_orders
+    description: >
+      One row per order, every order in the source. seller_id and product_id are
+      the lead (most expensive) item. Filter on is_completed and
+      is_in_analysis_window for qualifying orders. Partitioned by month and
+      clustered by customer on BigQuery.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_unique_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_unique_id
+      - name: seller_id
+        description: Lead item's seller. Null only for the orders with no items.
+        tests:
+          - not_null:
+              config:
+                where: "item_count > 0"
+          - relationships:
+              arguments:
+                to: ref('dim_sellers')
+                field: seller_id
+      - name: product_id
+        description: Lead item's product. Null only for the orders with no items.
+        tests:
+          - not_null:
+              config:
+                where: "item_count > 0"
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+      - name: order_purchase_date
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: customer_order_number
+        description: 1 for the person's first qualifying order, 2 for the second, and so on. Null for non-qualifying orders.
+      - name: delivery_delta_days
+        description: Actual minus estimated delivery, days. Positive is late.
+      - name: is_late_delivery
+
+  - name: fct_order_reviews
+    description: One row per review and order pair.
+    columns:
+      - name: order_review_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('fct_orders')
+                field: order_id
+      - name: review_score
+      - name: response_time_hours
+      - name: sentiment_flag
+        description: negative for scores 1 and 2, neutral for 3, positive for 4 and 5.
+        tests:
+          - accepted_values:
+              arguments:
+                values: [negative, neutral, positive]

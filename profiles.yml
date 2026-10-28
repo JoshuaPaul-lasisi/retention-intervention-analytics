@@ -1,0 +1,20 @@
+# No secrets in here: BigQuery uses your gcloud login (or a key file path from
+# the environment) and DuckDB writes a local file.
+retention_intervention_analytics:
+  target: "{{ env_var('DBT_TARGET', 'bigquery') }}"
+  outputs:
+    bigquery:
+      type: bigquery
+      method: "{{ env_var('BIGQUERY_AUTH_METHOD', 'oauth') }}"
+      keyfile: "{{ env_var('BIGQUERY_KEYFILE', '') }}"
+      project: "{{ env_var('GCP_PROJECT', 'set-GCP_PROJECT') }}"
+      dataset: "{{ env_var('BIGQUERY_DATASET', 'olist') }}"
+      location: "{{ env_var('BIGQUERY_LOCATION', 'US') }}"
+      threads: 4
+      job_execution_timeout_seconds: 300
+      priority: interactive
+    duckdb:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', 'olist.duckdb') }}"
+      schema: olist
+      threads: 4

@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: One row per order, renamed and typed. Timestamp columns end in _at.
+    tests:
+      - dbt_utils.equal_rowcount:
+          arguments:
+            compare_model: source('olist', 'olist_orders_dataset')
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_id
+        description: Order-scoped customer identifier; see stg_customers.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: order_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: [delivered, shipped, canceled, unavailable, invoiced, processing, created, approved]
+      - name: order_purchased_at
+        tests: [not_null]
+      - name: order_approved_at
+      - name: order_delivered_carrier_at
+      - name: order_delivered_customer_at
+        description: Null when the parcel never reached the customer.
+      - name: order_estimated_delivery_at
+        description: The delivery date promised at checkout (midnight).

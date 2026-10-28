@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_geolocation
+    description: >
+      Geolocation points, renamed and typed. Many points per zip code prefix and
+      some exact duplicates; int_zip_code_centroids collapses them to one row per prefix.
+    columns:
+      - name: zip_code_prefix
+        tests: [not_null]
+      - name: latitude
+      - name: longitude
+      - name: city
+      - name: state

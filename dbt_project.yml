@@ -1,0 +1,68 @@
+name: retention_intervention_analytics
+version: "1.0.0"
+config-version: 2
+
+profile: retention_intervention_analytics
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Raw Olist tables live in this BigQuery dataset (or DuckDB schema).
+  raw_dataset: olist_raw
+  # Same analysis window as the Olist retention analysis. Sep to Dec 2016 is a
+  # handful of test orders and the export stops partway through September 2018.
+  analysis_start_date: "2017-01-01"
+  snapshot_date: "2018-08-31"
+  # Repeat purchase windows, in days.
+  repeat_window_days: 180
+  voucher_metric_window_days: 60
+  # A delivery counts as late when it arrives more than this many days after the estimate.
+  late_delivery_threshold_days: 3
+  # Categories need this many 180-day-observed first-time buyers to be ranked.
+  min_category_buyers: 1000
+  # A ranked category is high-propensity when its 180-day repeat rate is at least
+  # this multiple of the overall rate.
+  high_propensity_min_lift: 1.2
+  # Categories need this many repeat buyers before their timing window is used.
+  min_category_repeaters: 30
+  # Voucher test: customers become eligible this many days after their first order
+  # (the parcel has arrived and been reviewed).
+  voucher_min_days_since_first_order: 14
+  # Date spine range.
+  date_spine_start: "2016-09-01"
+  date_spine_end: "2018-12-31"
+
+seeds:
+  retention_intervention_analytics:
+    +schema: seeds
+    brazil_state_regions:
+      +column_types:
+        state_code: "{{ 'string' if target.type == 'bigquery' else 'varchar' }}"
+        state_name: "{{ 'string' if target.type == 'bigquery' else 'varchar' }}"
+        region: "{{ 'string' if target.type == 'bigquery' else 'varchar' }}"
+    voucher_test_assignments:
+      +column_types:
+        customer_unique_id: "{{ 'string' if target.type == 'bigquery' else 'varchar' }}"
+        assigned_group: "{{ 'string' if target.type == 'bigquery' else 'varchar' }}"
+        assigned_at: "{{ 'date' }}"
+
+models:
+  retention_intervention_analytics:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    core:
+      +schema: core
+      +materialized: table
+    analytics:
+      +schema: analytics
+      +materialized: table

@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: stg_sellers
+    description: One row per seller, renamed and typed.
+    columns:
+      - name: seller_id
+        tests: [unique, not_null]
+      - name: seller_zip_code_prefix
+      - name: seller_city
+      - name: seller_state

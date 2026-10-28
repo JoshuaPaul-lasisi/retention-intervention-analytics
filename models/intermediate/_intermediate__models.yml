@@ -1,0 +1,107 @@
+version: 2
+
+models:
+  - name: int_orders_enriched
+    description: >
+      One row per order with its items, payments, lead product and the person
+      behind it. is_completed and is_in_analysis_window together define the
+      qualifying orders the retention analysis counts.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_unique_id
+        tests: [not_null]
+      - name: order_value
+        description: Item prices plus freight, R$.
+      - name: product_category
+        description: English category of the lead (most expensive) item.
+      - name: payment_method
+        description: The payment type that paid the largest share of the order.
+      - name: used_voucher
+        description: True when any payment line on the order was a voucher.
+      - name: is_completed
+        description: Has at least one item and is not canceled or unavailable.
+      - name: is_in_analysis_window
+        description: Purchased between analysis_start_date and snapshot_date.
+
+  - name: int_customers_deduplicated
+    description: >
+      One row per person. Collapses the order-scoped customer_id onto
+      customer_unique_id and rebuilds each person's purchase history from
+      qualifying orders. A repeat purchase is a qualifying order on a later
+      calendar day than the first; same-day second orders are split carts.
+    columns:
+      - name: customer_unique_id
+        tests: [unique, not_null]
+      - name: customer_id_count
+        description: How many order-scoped customer_ids this person had.
+      - name: has_qualifying_order
+        description: False for people whose only orders were canceled or outside the window.
+      - name: first_order_category
+        description: Lead category of the first qualifying order.
+      - name: days_to_second_purchase
+        description: Fractional days from first order to the first later-day order.
+      - name: is_repeat_buyer
+        description: Bought again on a later day at any point before the snapshot.
+      - name: is_repeat_window_observed
+        description: First order at least repeat_window_days before the snapshot, so the repeat outcome is known.
+      - name: is_repeat_within_window
+        description: Bought again within repeat_window_days. Null when not observed.
+
+  - name: int_delivery_and_review_signals
+    description: >
+      One row per order: delivery against the promise and the latest review.
+      Positive delivery_delta_days means late.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: delivery_delta_days
+        description: >
+          Actual minus estimated delivery, fractional days. Data quality gate:
+          values below -60 (more than 60 days early) point to a broken estimate
+          date. The raw data has 34 such orders, so the test warns on them and
+          only fails if more than 100 appear.
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -60
+              config:
+                warn_if: ">0"
+                error_if: ">100"
+      - name: is_on_time
+        description: Delivered on or before the estimate. Null when not delivered.
+      - name: is_late_delivery
+        description: Delivered more than late_delivery_threshold_days after the estimate. Null when not delivered.
+      - name: review_score
+        description: Score on the latest answered review.
+        tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]
+                quote: false
+      - name: review_response_hours
+        description: Hours from survey sent to survey answered.
+
+  - name: int_order_sellers
+    description: One row per order and seller, with the seller's share of the order value and the order's delivery outcome.
+    columns:
+      - name: order_seller_id
+        tests: [unique, not_null]
+
+  - name: int_seller_performance
+    description: One row per seller with qualifying orders.
+    columns:
+      - name: seller_id
+        tests: [unique, not_null]
+      - name: late_delivery_rate
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: int_zip_code_centroids
+    description: One row per zip code prefix, the mean of its geolocation points.
+    columns:
+      - name: zip_code_prefix
+        tests: [unique, not_null]

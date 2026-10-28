@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: mart_category_repeat_propensity
+    description: >
+      One row per first-order category. The follow-up email targeting list:
+      categories with is_high_propensity = true are where a follow-up is worth sending.
+    columns:
+      - name: first_order_category
+        tests: [unique, not_null]
+      - name: first_time_buyers
+        description: Every person whose first qualifying order was in this category.
+      - name: repeat_buyers
+        description: Of those, how many bought again on a later day before the snapshot.
+      - name: observed_buyers
+        description: First-time buyers whose first order was at least 180 days before the snapshot.
+      - name: repeat_buyers_within_window
+        description: Observed buyers who bought again within 180 days.
+      - name: repeat_rate
+        description: repeat_buyers_within_window / observed_buyers.
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: repeat_rate_ci_low
+        description: Lower end of the 95% Wilson interval.
+      - name: repeat_rate_ci_high
+        description: Upper end of the 95% Wilson interval.
+      - name: lift_vs_overall
+        description: repeat_rate divided by the rate across all observed buyers.
+      - name: avg_days_to_second_purchase
+        description: Mean days to return, among buyers back within 180 days.
+      - name: propensity_rank
+        description: 1 is the highest repeat rate among ranked categories.
+      - name: is_high_propensity
+        description: Ranked and at least high_propensity_min_lift times the overall rate.
+
+  - name: mart_email_timing_windows
+    description: One row per repeat buyer, with the gap between first and second purchase.
+    columns:
+      - name: customer_unique_id
+        tests: [unique, not_null]
+      - name: days_to_repeat
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: false
+      - name: is_in_timing_sample
+        description: Observed for 180 days and back within 180 days; the rows used to set send windows.
+
+  - name: mart_email_timing_windows_by_category
+    description: >
+      Days-to-repeat distribution per first-order category, plus an
+      all_categories row. Tells the email team when to send.
+    columns:
+      - name: first_order_category
+        tests: [unique, not_null]
+      - name: median_days_to_repeat
+      - name: suggested_send_day
+        description: 25th percentile of days to repeat, rounded.
+      - name: has_enough_repeaters
+        description: At least min_category_repeaters buyers behind the percentiles.
+
+  - name: mart_delivery_performance
+    description: One row per seller and month over qualifying orders.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [seller_id, order_month]
+    columns:
+      - name: seller_month_id
+        tests: [unique, not_null]
+      - name: seller_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_sellers')
+                field: seller_id
+      - name: on_time_rate
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: late_order_count
+
+  - name: mart_voucher_holdout_framework
+    description: >
+      The eligible population for the voucher test as of the snapshot date:
+      first order in a high-propensity category, no repeat yet, and inside the
+      category's timing window. assigned_group is null until the assignment is
+      loaded back through the voucher_test_assignments seed.
+    columns:
+      - name: customer_unique_id
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_unique_id
+      - name: first_order_category
+        tests: [not_null]
+      - name: days_since_first_order
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: "{{ var('voucher_min_days_since_first_order') }}"
+      - name: assigned_group
+        description: treatment or holdout. Null until assigned.
+        tests:
+          - accepted_values:
+              arguments:
+                values: [treatment, holdout]
+      - name: assigned_at
+        description: Date the assignment was made; the 60-day outcome window starts here.

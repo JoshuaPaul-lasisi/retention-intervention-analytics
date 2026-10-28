@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: stg_order_payments
+    description: One row per payment line on an order, renamed and typed. An order paid by card plus voucher has two lines.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [order_id, payment_sequential]
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: payment_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: [credit_card, boleto, voucher, debit_card, not_defined]
+      - name: payment_installments
+      - name: payment_value

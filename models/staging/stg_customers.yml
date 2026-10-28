@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: >
+      One row per customer_id, renamed and typed. Zip code prefixes are padded
+      back to five digits (loaders read them as numbers and drop leading zeros).
+
+
+      Known data quality issue in the source: customer_id is not a person. Olist
+      issues a new customer_id for every order, so the 99,441 customer_ids map to
+      96,096 people. customer_unique_id is the durable person identifier, and
+      every person-level model downstream uses it as the grain. Counting
+      customer_id instead makes the repeat purchase rate look like zero.
+    tests:
+      - dbt_utils.equal_rowcount:
+          arguments:
+            compare_model: source('olist', 'olist_customers_dataset')
+      - row_count_in_band:
+          arguments:
+            min_rows: 95000
+            max_rows: 105000
+    columns:
+      - name: customer_id
+        description: Order-scoped identifier. One per order; joins to stg_orders.customer_id.
+        tests: [unique, not_null]
+      - name: customer_unique_id
+        description: Person-scoped identifier. Use this for any analysis of people.
+        tests: [not_null]
+      - name: customer_zip_code_prefix
+        description: First five digits of the customer's zip code (CEP).
+      - name: customer_city
+        description: City name, lower case, as typed in the source.
+      - name: customer_state
+        description: Two-letter state code.
+        tests:
+          - relationships:
+              arguments:
+                to: ref('brazil_state_regions')
+                field: state_code

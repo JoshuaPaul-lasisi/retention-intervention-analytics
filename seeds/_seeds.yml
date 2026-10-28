@@ -1,0 +1,27 @@
+version: 2
+
+seeds:
+  - name: brazil_state_regions
+    description: The 27 Brazilian federative units and their IBGE macro-region.
+    columns:
+      - name: state_code
+        tests: [unique, not_null]
+      - name: region
+        tests:
+          - accepted_values:
+              arguments:
+                values: [North, Northeast, Central-West, Southeast, South]
+
+  - name: voucher_test_assignments
+    description: >
+      Treatment and holdout assignment for the voucher test, written by
+      scripts/assign_holdout.py. Ships empty: the mart's assigned_group stays
+      null until a real assignment is loaded.
+    columns:
+      - name: customer_unique_id
+        tests: [unique]
+      - name: assigned_group
+        tests:
+          - accepted_values:
+              arguments:
+                values: [treatment, holdout]

@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: stg_products
+    description: One row per product, renamed and typed. Fixes the source's "lenght" spelling.
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+      - name: product_category_name
+        description: Portuguese category name. Null for 610 products.
+      - name: product_name_length
+      - name: product_description_length
+      - name: product_photo_count
+      - name: product_weight_g
+      - name: product_length_cm
+      - name: product_height_cm
+      - name: product_width_cm

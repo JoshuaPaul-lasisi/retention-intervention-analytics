@@ -1,0 +1,46 @@
+version: 2
+
+exposures:
+  - name: voucher_test
+    label: Voucher retention test
+    type: analysis
+    maturity: low
+    url: https://github.com/JoshuaPaul-lasisi/retention-intervention-analytics/blob/main/analyses/voucher_test_readout.sql
+    description: >
+      A hold-out test of a second-purchase voucher, as the Olist retention
+      analysis recommended before any voucher rollout.
+
+
+      Grain: one row per eligible customer from mart_voucher_holdout_framework
+      (first order in a high-propensity category, no repeat yet, inside the
+      category's timing window).
+
+
+      Assignment: outside dbt, by scripts/assign_holdout.py. Customers are split
+      50/50 within each first-order category by a salted SHA-256 hash, so the
+      split is reproducible and the category mix matches across groups. The
+      result is loaded back as the voucher_test_assignments seed.
+
+
+      Expected group size: at the 2018-08-31 snapshot, 4,032 customers are
+      eligible, so about 2,016 per group. The baseline repeat rate within 60
+      days is about 1.1%. With 2,016 per group the test can detect a rise to
+      about 2.3% (80% power, 5% two-sided); a 10% holdout of 403 could only
+      detect 2.8% or more. The test only answers whether the voucher doubles
+      repeat buying, so run it at 50/50 or pool several monthly cohorts.
+
+
+      Metric: share of each group with a completed order on a later day than
+      assignment and within 60 days of it. Read out with
+      analyses/voucher_test_readout.sql.
+    depends_on:
+      - ref('mart_voucher_holdout_framework')
+      - ref('fct_orders')
+    owner:
+      name: JoshuaPaul-lasisi
+    meta:
+      holdout_share: 0.5
+      expected_group_size: 2016
+      baseline_repeat_rate_60d: 0.0113
+      minimum_detectable_repeat_rate_60d: 0.0227
+      metric_window_days: 60
