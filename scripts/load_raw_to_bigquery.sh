@@ -33,11 +33,18 @@ for table in "${TABLES[@]}"; do
   # the first column name.
   tmp="$(mktemp)"
   sed '1s/^\xEF\xBB\xBF//' "$file" > "$tmp"
+  # Schema detection can't find the header when every column is text, so the
+  # translation table gets its schema spelled out.
+  if [[ "$table" == product_category_name_translation ]]; then
+    schema_args=(--schema=product_category_name:STRING,product_category_name_english:STRING)
+  else
+    schema_args=(--autodetect)
+  fi
   echo "loading $table"
   bq --location="$LOCATION" load \
     --replace \
     --source_format=CSV \
-    --autodetect \
+    "${schema_args[@]}" \
     --skip_leading_rows=1 \
     --allow_quoted_newlines \
     "$GCP_PROJECT:$DATASET.$table" "$tmp"

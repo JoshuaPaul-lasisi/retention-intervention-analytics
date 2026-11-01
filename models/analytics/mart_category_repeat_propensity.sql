@@ -42,18 +42,19 @@ rates as (
 ),
 
 intervals as (
+    -- Wilson score interval, z = 1.96. n is null for a category with no
+    -- observed buyers, so the interval is null rather than a division by zero.
     select
         *,
-        -- Wilson score interval, z = 1.96
-        (repeat_rate + 1.96 * 1.96 / (2 * observed_buyers)
-            - 1.96 * sqrt(repeat_rate * (1 - repeat_rate) / observed_buyers
-                          + 1.96 * 1.96 / (4 * observed_buyers * observed_buyers)))
-            / (1 + 1.96 * 1.96 / observed_buyers)                                   as repeat_rate_ci_low,
-        (repeat_rate + 1.96 * 1.96 / (2 * observed_buyers)
-            + 1.96 * sqrt(repeat_rate * (1 - repeat_rate) / observed_buyers
-                          + 1.96 * 1.96 / (4 * observed_buyers * observed_buyers)))
-            / (1 + 1.96 * 1.96 / observed_buyers)                                   as repeat_rate_ci_high
-    from rates
+        (repeat_rate + 1.96 * 1.96 / (2 * n)
+            - 1.96 * sqrt(repeat_rate * (1 - repeat_rate) / n + 1.96 * 1.96 / (4 * n * n)))
+            / (1 + 1.96 * 1.96 / n)                                                 as repeat_rate_ci_low,
+        (repeat_rate + 1.96 * 1.96 / (2 * n)
+            + 1.96 * sqrt(repeat_rate * (1 - repeat_rate) / n + 1.96 * 1.96 / (4 * n * n)))
+            / (1 + 1.96 * 1.96 / n)                                                 as repeat_rate_ci_high
+    from (
+        select *, nullif(observed_buyers, 0) as n from rates
+    ) as with_n
 )
 
 select

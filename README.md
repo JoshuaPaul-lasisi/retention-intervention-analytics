@@ -69,7 +69,7 @@ The last two were not in the original plan. Without them the seller logic would 
 
 Dimensions: `dim_customers` (one row per person, with region from the seed), `dim_products`, `dim_sellers` and `dim_date` (a date spine from BigQuery's `generate_date_array`).
 
-Facts: `fct_orders` (one row per order, every order in the source, partitioned by month and clustered by customer on BigQuery) and `fct_order_reviews` (one row per review and order pair, with response time and a sentiment flag; 1 and 2 stars are negative).
+Facts: `fct_orders` (one row per order, every order in the source, clustered by customer and purchase date on BigQuery) and `fct_order_reviews` (one row per review and order pair, with response time and a sentiment flag; 1 and 2 stars are negative).
 
 `fct_orders` carries the lead item's seller and product as its foreign keys. `dim_customers` keeps people with no qualifying order (flagged) so that every order has a customer.
 
@@ -139,6 +139,8 @@ The download script pulls the nine CSVs from Olist's own GitHub copy into `data/
 
 ### On BigQuery
 
+The project has been built on BigQuery (project `customer-retention-513409`, free sandbox tier): 137 checks pass with the same one warning, and every mart matches the DuckDB build to the cent.
+
 ```bash
 gcloud auth application-default login
 ```
@@ -156,6 +158,11 @@ dbt deps && dbt build
 ```
 
 This creates the datasets `olist_staging`, `olist_intermediate`, `olist_core`, `olist_analytics` and `olist_seeds`. The raw tables go to `olist_raw`. Set `BIGQUERY_LOCATION` if you don't want the US multi-region, and `BIGQUERY_AUTH_METHOD=service-account` with `BIGQUERY_KEYFILE` to use a service account file.
+
+Two things the BigQuery run caught that DuckDB did not:
+
+1. Schema detection names the columns of an all-text CSV `string_field_0` and `string_field_1`, so the load script gives the category translation table its schema explicitly.
+2. The sandbox tier drops any table partition older than 60 days as it is written. A `fct_orders` partitioned by purchase month came out empty, so it is clustered instead; at 100,000 rows partitioning gains nothing anyway. The sandbox also expires tables after 60 days, so rerun `dbt build` to bring them back, or turn on billing to keep them.
 
 ### Locally on DuckDB
 

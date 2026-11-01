@@ -1,10 +1,8 @@
+{#- Clustered, not partitioned: at 100,000 rows partitioning saves nothing, and
+    the BigQuery sandbox drops any partition older than 60 days on write, which
+    would empty a table of 2016 to 2018 orders. -#}
 {%- if target.type == 'bigquery' %}
-{{
-    config(
-        partition_by={'field': 'order_purchase_date', 'data_type': 'date', 'granularity': 'month'},
-        cluster_by=['customer_unique_id']
-    )
-}}
+{{ config(cluster_by=['customer_unique_id', 'order_purchase_date']) }}
 {%- endif %}
 
 -- One row per order, every order in the source. Filter on is_completed and
