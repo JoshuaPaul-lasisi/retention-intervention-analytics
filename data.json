@@ -1,0 +1,707 @@
+{
+ "snapshot_date": "2018-08-31",
+ "kpis": {
+  "customers": 94703,
+  "repeat_buyers": 2053,
+  "observed_customers": 57283,
+  "repeat_rate_180d": 0.019814,
+  "qualifying_orders": 97905,
+  "late_delivery_rate": 0.053657,
+  "voucher_eligible": 4032
+ },
+ "categories": [
+  {
+   "first_order_category": "fashion_bags_accessories",
+   "observed_buyers": 1179,
+   "repeat_buyers_within_window": 38,
+   "repeat_rate": 0.032231,
+   "repeat_rate_ci_low": 0.023571,
+   "repeat_rate_ci_high": 0.043929,
+   "lift_vs_overall": 1.626671,
+   "propensity_rank": 1,
+   "is_high_propensity": true,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "bed_bath_table",
+   "observed_buyers": 5520,
+   "repeat_buyers_within_window": 151,
+   "repeat_rate": 0.027355,
+   "repeat_rate_ci_low": 0.02337,
+   "repeat_rate_ci_high": 0.031998,
+   "lift_vs_overall": 1.3806,
+   "propensity_rank": 2,
+   "is_high_propensity": true,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "sports_leisure",
+   "observed_buyers": 4650,
+   "repeat_buyers_within_window": 124,
+   "repeat_rate": 0.026667,
+   "repeat_rate_ci_low": 0.022412,
+   "repeat_rate_ci_high": 0.031703,
+   "lift_vs_overall": 1.345856,
+   "propensity_rank": 3,
+   "is_high_propensity": true,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "furniture_decor",
+   "observed_buyers": 3822,
+   "repeat_buyers_within_window": 93,
+   "repeat_rate": 0.024333,
+   "repeat_rate_ci_low": 0.019905,
+   "repeat_rate_ci_high": 0.029716,
+   "lift_vs_overall": 1.228067,
+   "propensity_rank": 4,
+   "is_high_propensity": true,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "garden_tools",
+   "observed_buyers": 2355,
+   "repeat_buyers_within_window": 51,
+   "repeat_rate": 0.021656,
+   "repeat_rate_ci_low": 0.01651,
+   "repeat_rate_ci_high": 0.028361,
+   "lift_vs_overall": 1.092972,
+   "propensity_rank": 5,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "baby",
+   "observed_buyers": 1535,
+   "repeat_buyers_within_window": 31,
+   "repeat_rate": 0.020195,
+   "repeat_rate_ci_low": 0.014264,
+   "repeat_rate_ci_high": 0.028523,
+   "lift_vs_overall": 1.019256,
+   "propensity_rank": 6,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "health_beauty",
+   "observed_buyers": 4483,
+   "repeat_buyers_within_window": 90,
+   "repeat_rate": 0.020076,
+   "repeat_rate_ci_low": 0.016362,
+   "repeat_rate_ci_high": 0.024611,
+   "lift_vs_overall": 1.01322,
+   "propensity_rank": 7,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "perfumery",
+   "observed_buyers": 2022,
+   "repeat_buyers_within_window": 40,
+   "repeat_rate": 0.019782,
+   "repeat_rate_ci_low": 0.014561,
+   "repeat_rate_ci_high": 0.026825,
+   "lift_vs_overall": 0.99841,
+   "propensity_rank": 8,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "watches_gifts",
+   "observed_buyers": 2731,
+   "repeat_buyers_within_window": 48,
+   "repeat_rate": 0.017576,
+   "repeat_rate_ci_low": 0.013282,
+   "repeat_rate_ci_high": 0.023225,
+   "lift_vs_overall": 0.887053,
+   "propensity_rank": 9,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "electronics",
+   "observed_buyers": 1439,
+   "repeat_buyers_within_window": 25,
+   "repeat_rate": 0.017373,
+   "repeat_rate_ci_low": 0.011795,
+   "repeat_rate_ci_high": 0.025521,
+   "lift_vs_overall": 0.876817,
+   "propensity_rank": 10,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "toys",
+   "observed_buyers": 2673,
+   "repeat_buyers_within_window": 46,
+   "repeat_rate": 0.017209,
+   "repeat_rate_ci_low": 0.012927,
+   "repeat_rate_ci_high": 0.022877,
+   "lift_vs_overall": 0.868538,
+   "propensity_rank": 11,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "telephony",
+   "observed_buyers": 2678,
+   "repeat_buyers_within_window": 46,
+   "repeat_rate": 0.017177,
+   "repeat_rate_ci_low": 0.012903,
+   "repeat_rate_ci_high": 0.022835,
+   "lift_vs_overall": 0.866916,
+   "propensity_rank": 12,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "housewares",
+   "observed_buyers": 3006,
+   "repeat_buyers_within_window": 50,
+   "repeat_rate": 0.016633,
+   "repeat_rate_ci_low": 0.01264,
+   "repeat_rate_ci_high": 0.021861,
+   "lift_vs_overall": 0.839481,
+   "propensity_rank": 13,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "stationery",
+   "observed_buyers": 1410,
+   "repeat_buyers_within_window": 22,
+   "repeat_rate": 0.015603,
+   "repeat_rate_ci_low": 0.010326,
+   "repeat_rate_ci_high": 0.023512,
+   "lift_vs_overall": 0.787469,
+   "propensity_rank": 14,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "auto",
+   "observed_buyers": 1949,
+   "repeat_buyers_within_window": 30,
+   "repeat_rate": 0.015393,
+   "repeat_rate_ci_low": 0.010803,
+   "repeat_rate_ci_high": 0.021889,
+   "lift_vs_overall": 0.776854,
+   "propensity_rank": 15,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "computers_accessories",
+   "observed_buyers": 3943,
+   "repeat_buyers_within_window": 60,
+   "repeat_rate": 0.015217,
+   "repeat_rate_ci_low": 0.011841,
+   "repeat_rate_ci_high": 0.019537,
+   "lift_vs_overall": 0.767988,
+   "propensity_rank": 16,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "unknown",
+   "observed_buyers": 1061,
+   "repeat_buyers_within_window": 16,
+   "repeat_rate": 0.01508,
+   "repeat_rate_ci_low": 0.009303,
+   "repeat_rate_ci_high": 0.024356,
+   "lift_vs_overall": 0.761087,
+   "propensity_rank": 17,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  },
+  {
+   "first_order_category": "cool_stuff",
+   "observed_buyers": 2646,
+   "repeat_buyers_within_window": 27,
+   "repeat_rate": 0.010204,
+   "repeat_rate_ci_low": 0.007022,
+   "repeat_rate_ci_high": 0.014806,
+   "lift_vs_overall": 0.514996,
+   "propensity_rank": 18,
+   "is_high_propensity": false,
+   "overall_repeat_rate": 0.019814
+  }
+ ],
+ "timing": [
+  {
+   "first_order_category": "all_categories",
+   "repeat_buyers": 1135,
+   "p25_days_to_repeat": 20.07485,
+   "median_days_to_repeat": 56.820764,
+   "p75_days_to_repeat": 112.853119,
+   "share_within_30_days": 0.326872,
+   "share_within_60_days": 0.514537,
+   "suggested_send_day": 20.0
+  },
+  {
+   "first_order_category": "fashion_bags_accessories",
+   "repeat_buyers": 38,
+   "p25_days_to_repeat": 12.357269,
+   "median_days_to_repeat": 33.454363,
+   "p75_days_to_repeat": 78.844737,
+   "share_within_30_days": 0.5,
+   "share_within_60_days": 0.631579,
+   "suggested_send_day": 12.0
+  },
+  {
+   "first_order_category": "watches_gifts",
+   "repeat_buyers": 48,
+   "p25_days_to_repeat": 8.868634,
+   "median_days_to_repeat": 37.941424,
+   "p75_days_to_repeat": 83.896606,
+   "share_within_30_days": 0.479167,
+   "share_within_60_days": 0.5625,
+   "suggested_send_day": 9.0
+  },
+  {
+   "first_order_category": "bed_bath_table",
+   "repeat_buyers": 151,
+   "p25_days_to_repeat": 16.677691,
+   "median_days_to_repeat": 42.913403,
+   "p75_days_to_repeat": 88.906238,
+   "share_within_30_days": 0.397351,
+   "share_within_60_days": 0.596026,
+   "suggested_send_day": 17.0
+  },
+  {
+   "first_order_category": "toys",
+   "repeat_buyers": 46,
+   "p25_days_to_repeat": 21.496531,
+   "median_days_to_repeat": 46.02735,
+   "p75_days_to_repeat": 91.234988,
+   "share_within_30_days": 0.347826,
+   "share_within_60_days": 0.586957,
+   "suggested_send_day": 21.0
+  },
+  {
+   "first_order_category": "auto",
+   "repeat_buyers": 30,
+   "p25_days_to_repeat": 14.117289,
+   "median_days_to_repeat": 46.991094,
+   "p75_days_to_repeat": 72.944028,
+   "share_within_30_days": 0.4,
+   "share_within_60_days": 0.6,
+   "suggested_send_day": 14.0
+  },
+  {
+   "first_order_category": "baby",
+   "repeat_buyers": 31,
+   "p25_days_to_repeat": 8.494196,
+   "median_days_to_repeat": 47.163194,
+   "p75_days_to_repeat": 91.925955,
+   "share_within_30_days": 0.451613,
+   "share_within_60_days": 0.580645,
+   "suggested_send_day": 8.0
+  },
+  {
+   "first_order_category": "telephony",
+   "repeat_buyers": 46,
+   "p25_days_to_repeat": 17.6218,
+   "median_days_to_repeat": 53.09349,
+   "p75_days_to_repeat": 117.489928,
+   "share_within_30_days": 0.304348,
+   "share_within_60_days": 0.521739,
+   "suggested_send_day": 18.0
+  },
+  {
+   "first_order_category": "sports_leisure",
+   "repeat_buyers": 124,
+   "p25_days_to_repeat": 30.064045,
+   "median_days_to_repeat": 58.908675,
+   "p75_days_to_repeat": 111.312161,
+   "share_within_30_days": 0.25,
+   "share_within_60_days": 0.508065,
+   "suggested_send_day": 30.0
+  },
+  {
+   "first_order_category": "garden_tools",
+   "repeat_buyers": 51,
+   "p25_days_to_repeat": 27.663837,
+   "median_days_to_repeat": 62.914028,
+   "p75_days_to_repeat": 126.402037,
+   "share_within_30_days": 0.313725,
+   "share_within_60_days": 0.490196,
+   "suggested_send_day": 28.0
+  },
+  {
+   "first_order_category": "furniture_decor",
+   "repeat_buyers": 93,
+   "p25_days_to_repeat": 21.033461,
+   "median_days_to_repeat": 65.167836,
+   "p75_days_to_repeat": 113.150995,
+   "share_within_30_days": 0.27957,
+   "share_within_60_days": 0.494624,
+   "suggested_send_day": 21.0
+  },
+  {
+   "first_order_category": "health_beauty",
+   "repeat_buyers": 90,
+   "p25_days_to_repeat": 27.637758,
+   "median_days_to_repeat": 66.632616,
+   "p75_days_to_repeat": 128.477104,
+   "share_within_30_days": 0.288889,
+   "share_within_60_days": 0.466667,
+   "suggested_send_day": 28.0
+  },
+  {
+   "first_order_category": "perfumery",
+   "repeat_buyers": 40,
+   "p25_days_to_repeat": 19.939578,
+   "median_days_to_repeat": 67.492581,
+   "p75_days_to_repeat": 127.172804,
+   "share_within_30_days": 0.325,
+   "share_within_60_days": 0.425,
+   "suggested_send_day": 20.0
+  },
+  {
+   "first_order_category": "computers_accessories",
+   "repeat_buyers": 60,
+   "p25_days_to_repeat": 29.57125,
+   "median_days_to_repeat": 76.568594,
+   "p75_days_to_repeat": 119.3489,
+   "share_within_30_days": 0.266667,
+   "share_within_60_days": 0.366667,
+   "suggested_send_day": 30.0
+  },
+  {
+   "first_order_category": "housewares",
+   "repeat_buyers": 50,
+   "p25_days_to_repeat": 27.692014,
+   "median_days_to_repeat": 81.980972,
+   "p75_days_to_repeat": 128.637668,
+   "share_within_30_days": 0.28,
+   "share_within_60_days": 0.36,
+   "suggested_send_day": 28.0
+  }
+ ],
+ "delivery_monthly": [
+  {
+   "order_month": "2017-01-01",
+   "orders": 791,
+   "delivered_orders": 754,
+   "late_orders": 20,
+   "late_delivery_rate": 0.026525,
+   "on_time_rate": 0.969496,
+   "gmv": 136943.46
+  },
+  {
+   "order_month": "2017-02-01",
+   "orders": 1731,
+   "delivered_orders": 1666,
+   "late_orders": 44,
+   "late_delivery_rate": 0.026411,
+   "on_time_rate": 0.968187,
+   "gmv": 283561.69
+  },
+  {
+   "order_month": "2017-03-01",
+   "orders": 2622,
+   "delivered_orders": 2551,
+   "late_orders": 94,
+   "late_delivery_rate": 0.036848,
+   "on_time_rate": 0.944336,
+   "gmv": 425617.96
+  },
+  {
+   "order_month": "2017-04-01",
+   "orders": 2395,
+   "delivered_orders": 2321,
+   "late_orders": 110,
+   "late_delivery_rate": 0.047393,
+   "on_time_rate": 0.921155,
+   "gmv": 405848.61
+  },
+  {
+   "order_month": "2017-05-01",
+   "orders": 3672,
+   "delivered_orders": 3577,
+   "late_orders": 85,
+   "late_delivery_rate": 0.023763,
+   "on_time_rate": 0.964216,
+   "gmv": 582710.83
+  },
+  {
+   "order_month": "2017-06-01",
+   "orders": 3230,
+   "delivered_orders": 3160,
+   "late_orders": 75,
+   "late_delivery_rate": 0.023734,
+   "on_time_rate": 0.961709,
+   "gmv": 499652.24
+  },
+  {
+   "order_month": "2017-07-01",
+   "orders": 4014,
+   "delivered_orders": 3940,
+   "late_orders": 89,
+   "late_delivery_rate": 0.022589,
+   "on_time_rate": 0.966244,
+   "gmv": 578753.73
+  },
+  {
+   "order_month": "2017-08-01",
+   "orders": 4332,
+   "delivered_orders": 4253,
+   "late_orders": 94,
+   "late_delivery_rate": 0.022102,
+   "on_time_rate": 0.967082,
+   "gmv": 661986.28
+  },
+  {
+   "order_month": "2017-09-01",
+   "orders": 4273,
+   "delivered_orders": 4196,
+   "late_orders": 138,
+   "late_delivery_rate": 0.032888,
+   "on_time_rate": 0.948522,
+   "gmv": 717102.72
+  },
+  {
+   "order_month": "2017-10-01",
+   "orders": 4616,
+   "delivered_orders": 4547,
+   "late_orders": 147,
+   "late_delivery_rate": 0.032329,
+   "on_time_rate": 0.947878,
+   "gmv": 764861.15
+  },
+  {
+   "order_month": "2017-11-01",
+   "orders": 7518,
+   "delivered_orders": 7385,
+   "late_orders": 722,
+   "late_delivery_rate": 0.097766,
+   "on_time_rate": 0.858362,
+   "gmv": 1173387.01
+  },
+  {
+   "order_month": "2017-12-01",
+   "orders": 5680,
+   "delivered_orders": 5575,
+   "late_orders": 314,
+   "late_delivery_rate": 0.056323,
+   "on_time_rate": 0.916592,
+   "gmv": 862299.69
+  },
+  {
+   "order_month": "2018-01-01",
+   "orders": 7300,
+   "delivered_orders": 7182,
+   "late_orders": 329,
+   "late_delivery_rate": 0.045809,
+   "on_time_rate": 0.935394,
+   "gmv": 1102475.27
+  },
+  {
+   "order_month": "2018-02-01",
+   "orders": 6676,
+   "delivered_orders": 6607,
+   "late_orders": 781,
+   "late_delivery_rate": 0.118208,
+   "on_time_rate": 0.841078,
+   "gmv": 980154.6
+  },
+  {
+   "order_month": "2018-03-01",
+   "orders": 7261,
+   "delivered_orders": 7096,
+   "late_orders": 1096,
+   "late_delivery_rate": 0.154453,
+   "on_time_rate": 0.788472,
+   "gmv": 1152785.45
+  },
+  {
+   "order_month": "2018-04-01",
+   "orders": 7054,
+   "delivered_orders": 6931,
+   "late_orders": 245,
+   "late_delivery_rate": 0.035348,
+   "on_time_rate": 0.947915,
+   "gmv": 1156634.92
+  },
+  {
+   "order_month": "2018-05-01",
+   "orders": 6947,
+   "delivered_orders": 6863,
+   "late_orders": 342,
+   "late_delivery_rate": 0.049832,
+   "on_time_rate": 0.91884,
+   "gmv": 1146158.06
+  },
+  {
+   "order_month": "2018-06-01",
+   "orders": 6259,
+   "delivered_orders": 6210,
+   "late_orders": 57,
+   "late_delivery_rate": 0.009179,
+   "on_time_rate": 0.986634,
+   "gmv": 1020606.1
+  },
+  {
+   "order_month": "2018-07-01",
+   "orders": 6334,
+   "delivered_orders": 6257,
+   "late_orders": 158,
+   "late_delivery_rate": 0.025252,
+   "on_time_rate": 0.955889,
+   "gmv": 1039816.84
+  },
+  {
+   "order_month": "2018-08-01",
+   "orders": 6540,
+   "delivered_orders": 6470,
+   "late_orders": 232,
+   "late_delivery_rate": 0.035858,
+   "on_time_rate": 0.897836,
+   "gmv": 997040.03
+  }
+ ],
+ "worst_sellers": [
+  {
+   "seller_id": "beadbee30901a7f61d031b6b686095ad",
+   "seller_state": "SP",
+   "delivered_orders": 63,
+   "late_orders": 13,
+   "gmv": 5158.64,
+   "avg_review_score": 3.888889,
+   "lifetime_late_rate": 0.203125,
+   "late_delivery_rate": 0.206349
+  },
+  {
+   "seller_id": "8b9d6eec4a7eb7d0f9d579ce0b38324d",
+   "seller_state": "RJ",
+   "delivered_orders": 46,
+   "late_orders": 5,
+   "gmv": 5635.74,
+   "avg_review_score": 3.978723,
+   "lifetime_late_rate": 0.104167,
+   "late_delivery_rate": 0.108696
+  },
+  {
+   "seller_id": "056b4ada5bbc2c50cc7842547dda6b51",
+   "seller_state": "RJ",
+   "delivered_orders": 41,
+   "late_orders": 4,
+   "gmv": 8079.15,
+   "avg_review_score": 4.212121,
+   "lifetime_late_rate": 0.109375,
+   "late_delivery_rate": 0.097561
+  },
+  {
+   "seller_id": "04308b1ee57b6625f47df1d56f00eedf",
+   "seller_state": "SC",
+   "delivered_orders": 44,
+   "late_orders": 4,
+   "gmv": 26710.78,
+   "avg_review_score": 3.613636,
+   "lifetime_late_rate": 0.076087,
+   "late_delivery_rate": 0.090909
+  },
+  {
+   "seller_id": "b561927807645834b59ef0d16ba55a24",
+   "seller_state": "SP",
+   "delivered_orders": 46,
+   "late_orders": 4,
+   "gmv": 3031.58,
+   "avg_review_score": 4.478261,
+   "lifetime_late_rate": 0.105882,
+   "late_delivery_rate": 0.086957
+  },
+  {
+   "seller_id": "06a2c3af7b3aee5d69171b0e14f0ee87",
+   "seller_state": "MA",
+   "delivered_orders": 223,
+   "late_orders": 19,
+   "gmv": 29935.38,
+   "avg_review_score": 4.173213,
+   "lifetime_late_rate": 0.161954,
+   "late_delivery_rate": 0.085202
+  },
+  {
+   "seller_id": "f46490624488d3ff7ce78613913a7711",
+   "seller_state": "SP",
+   "delivered_orders": 77,
+   "late_orders": 6,
+   "gmv": 7376.11,
+   "avg_review_score": 3.625,
+   "lifetime_late_rate": 0.075,
+   "late_delivery_rate": 0.077922
+  },
+  {
+   "seller_id": "fe2032dab1a61af8794248c8196565c9",
+   "seller_state": "SP",
+   "delivered_orders": 55,
+   "late_orders": 4,
+   "gmv": 13352.03,
+   "avg_review_score": 4.414091,
+   "lifetime_late_rate": 0.078498,
+   "late_delivery_rate": 0.072727
+  },
+  {
+   "seller_id": "16090f2ca825584b5a147ab24aa30c86",
+   "seller_state": "SP",
+   "delivered_orders": 153,
+   "late_orders": 11,
+   "gmv": 9945.41,
+   "avg_review_score": 4.113099,
+   "lifetime_late_rate": 0.065327,
+   "late_delivery_rate": 0.071895
+  },
+  {
+   "seller_id": "e9bc59e7b60fc3063eb2290deda4cced",
+   "seller_state": "PR",
+   "delivered_orders": 70,
+   "late_orders": 5,
+   "gmv": 10163.24,
+   "avg_review_score": 3.797297,
+   "lifetime_late_rate": 0.057416,
+   "late_delivery_rate": 0.071429
+  }
+ ],
+ "voucher": {
+  "by_category": [
+   {
+    "first_order_category": "bed_bath_table",
+    "eligible_customers": 1442,
+    "min_days": 14,
+    "max_days": 88
+   },
+   {
+    "first_order_category": "sports_leisure",
+    "eligible_customers": 1281,
+    "min_days": 14,
+    "max_days": 111
+   },
+   {
+    "first_order_category": "furniture_decor",
+    "eligible_customers": 1114,
+    "min_days": 14,
+    "max_days": 113
+   },
+   {
+    "first_order_category": "fashion_bags_accessories",
+    "eligible_customers": 195,
+    "min_days": 14,
+    "max_days": 78
+   }
+  ],
+  "design": {
+   "baseline_rate_60d": 0.011264,
+   "split_50_50": {
+    "holdout": 2016,
+    "treatment": 2016,
+    "min_detectable_rate": 0.02266399999999993
+   },
+   "split_90_10": {
+    "holdout": 403,
+    "treatment": 3629,
+    "min_detectable_rate": 0.0278639999999999
+   }
+  }
+ }
+}
