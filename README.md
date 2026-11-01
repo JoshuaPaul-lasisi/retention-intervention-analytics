@@ -2,6 +2,14 @@
 
 A dbt project on BigQuery that turns the conclusions of the [Olist customer retention analysis](https://github.com/JoshuaPaul-lasisi/olist-customer-retention) into tables a marketing team can use: who to email, when to email them, which sellers are hurting the experience, and who goes into a voucher test.
 
+Dashboard: [joshuapaul-lasisi.github.io/retention-intervention-analytics](https://joshuapaul-lasisi.github.io/retention-intervention-analytics/)
+
+Model docs and lineage graph: [joshuapaul-lasisi.github.io/retention-intervention-analytics/docs](https://joshuapaul-lasisi.github.io/retention-intervention-analytics/docs/)
+
+Both are rebuilt from the marts and published to GitHub Pages on every push to main.
+
+![Dashboard](docs/images/dashboard.png)
+
 ## Where this comes from
 
 The Olist analysis found that 97.8% of customers buy once, that only about 2% come back within 180 days, and that raising that to 3% would add about R$129,000 of GMV a year. Retention spend therefore has to be cheap: follow-up email, timing and category targeting, with any voucher tested against a hold-out group before rollout.
@@ -28,11 +36,17 @@ models/
   core/          star schema: dimensions and facts
   analytics/     marts for each intervention, and the voucher test exposure
 seeds/           Brazil state regions; voucher test assignments
+site/            the dashboard page; CI adds its data and the dbt docs before publishing
 macros/          BigQuery and DuckDB differences; category translation; a row count test
 analyses/        voucher test readout
 tests/           reconciliation tests across layers
-scripts/         data download, BigQuery load, holdout assignment
+scripts/         data download, BigQuery load, holdout assignment, dashboard data export
+docs/images/     dashboard and lineage screenshots
 ```
+
+The lineage graph, from the raw Olist tables on the left to the voucher test exposure on the right. The interactive version is on the [docs site](https://joshuapaul-lasisi.github.io/retention-intervention-analytics/docs/#!/overview?g_v=1).
+
+![Lineage graph](docs/images/lineage.png)
 
 ### Staging (9 models)
 
@@ -111,7 +125,7 @@ The sizing is the weak point and I'd rather say so here. With 4,032 eligible peo
 
 ## How to run
 
-You need Python 3.10 or later.
+You need Python 3.10 or later. `requirements.txt` pins exact versions (dbt-core 1.12.6, dbt-bigquery 1.12.1, dbt-duckdb 1.11.1, dbt_utils 1.3.0) and `dbt_project.yml` refuses to run on any other dbt-core version, so a build here and a build in CI use the same code.
 
 ```bash
 pip install -r requirements.txt
@@ -163,6 +177,16 @@ dbt docs generate && dbt docs serve
 
 The docs site shows every model and column description and the lineage graph from raw tables to the exposure.
 
+### The dashboard
+
+`site/index.html` is one static page: plain HTML and SVG, no libraries. It reads `site/data.json`, which `scripts/export_dashboard_data.py` writes from the DuckDB build. To see it locally after `dbt build`:
+
+```bash
+python scripts/export_dashboard_data.py && python -m http.server -d site 8000
+```
+
+It has four parts, one per mart: repeat rate by first category with 95% intervals (who to email), days to second purchase by category (when to email), the monthly late delivery rate with the worst recent sellers, and the voucher test population with the smallest lift each split can detect. Every chart has a table view.
+
 ## Limits
 
 1. The data ends in August 2018, so the marts are a snapshot as of 31 August 2018. In production the snapshot date would be the run date and the eligible pool would refresh daily.
@@ -172,7 +196,7 @@ The docs site shows every model and column description and the lineage graph fro
 
 ## Tools
 
-dbt Core 1.10 or later, BigQuery, DuckDB for local runs and CI, dbt_utils, Python for the assignment script.
+dbt Core 1.12.6, BigQuery, DuckDB for local runs and CI, dbt_utils 1.3.0, Python for the assignment and export scripts, plain HTML and SVG for the dashboard, GitHub Actions and GitHub Pages.
 
 ## Licence
 

@@ -1,3 +1,8 @@
-dbt-core>=1.10,<2.0
-dbt-bigquery>=1.10,<2.0
-dbt-duckdb>=1.10,<2.0
+# Exact versions the project is built and tested with. Change them together,
+# then run dbt build on both targets before committing.
+dbt-core==1.12.6
+dbt-adapters==1.24.5
+dbt-common==1.39.0
+dbt-bigquery==1.12.1
+dbt-duckdb==1.11.1
+duckdb==2.0.0

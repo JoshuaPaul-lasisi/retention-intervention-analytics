@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Olist retention interventions</title>
+<meta name="description" content="Who to email, when to email them, which sellers are hurting delivery, and who goes into the voucher test. Built from the dbt marts on the Olist dataset.">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.10);
+  --series-1: #2a78d6;
+  --series-1-wash: rgba(42,120,214,0.10);
+  --context: #b9b8b0;
+  --link: #1c5cab;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255,255,255,0.10);
+    --series-1: #3987e5;
+    --series-1-wash: rgba(57,135,229,0.12);
+    --context: #6b6a64;
+    --link: #86b6ef;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface-1: #1a1a19;
+  --text-primary: #f0efec;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --border: rgba(255,255,255,0.10);
+  --series-1: #3987e5;
+  --series-1-wash: rgba(57,135,229,0.12);
+  --context: #6b6a64;
+  --link: #86b6ef;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--page);
+  color: var(--text-primary);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+a { color: var(--link); }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 32px 16px 48px; }
+header h1 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; font-weight: 650; }
+header p { margin: 0; color: var(--text-secondary); max-width: 760px; }
+nav.links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 14px; font-size: 14px; }
+.tiles { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 12px; margin: 28px 0; }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.tile .label { font-size: 13px; color: var(--text-secondary); }
+.tile .value { font-size: 28px; font-weight: 600; margin-top: 4px; line-height: 1.15; }
+.tile.hero .value { font-size: 52px; }
+.tile .note { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 20px 20px 14px; margin-bottom: 16px; min-width: 0; }
+.card h2 { font-size: 17px; margin: 0 0 4px; font-weight: 620; }
+.card .sub { font-size: 13.5px; color: var(--text-secondary); margin: 0 0 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--text-secondary); margin-bottom: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.legend i.dot { border-radius: 50%; }
+.legend i.line { width: 14px; height: 2px; border-radius: 1px; background: var(--text-secondary); }
+.chart { width: 100%; position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { font-family: inherit; }
+.tick { font-size: 11px; fill: var(--text-muted); font-variant-numeric: tabular-nums; }
+.rowlabel { font-size: 12px; fill: var(--text-secondary); }
+.vlabel { font-size: 11.5px; fill: var(--text-primary); font-variant-numeric: tabular-nums; }
+.annot { font-size: 11.5px; fill: var(--text-secondary); }
+.hit { fill: transparent; cursor: default; }
+.hit:focus { outline: none; }
+.hit:focus-visible { stroke: var(--text-secondary); stroke-width: 1; }
+.mark { transition: opacity .12s; }
+g.row:hover .mark, g.row:focus-within .mark { opacity: .78; }
+details { margin-top: 10px; font-size: 13px; }
+summary { cursor: pointer; color: var(--text-secondary); }
+table { border-collapse: collapse; width: 100%; margin-top: 8px; font-size: 12.5px; }
+th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { color: var(--text-secondary); font-weight: 600; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; }
+.callout { font-size: 13.5px; color: var(--text-secondary); border-left: 2px solid var(--axis); padding: 2px 0 2px 12px; margin: 14px 0 6px; }
+#tip {
+  position: fixed; pointer-events: none; z-index: 10; display: none;
+  background: var(--surface-1); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.12); font-size: 12.5px; min-width: 150px;
+}
+#tip .t { color: var(--text-secondary); margin-bottom: 4px; }
+#tip .r { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+#tip .r b { font-weight: 650; font-variant-numeric: tabular-nums; }
+#tip .k { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+#tip .k i { width: 12px; height: 2px; display: inline-block; border-radius: 1px; }
+footer { font-size: 12.5px; color: var(--text-muted); margin-top: 24px; }
+@media (max-width: 900px) {
+  .tiles { grid-template-columns: repeat(2, 1fr); }
+  .tile.hero { grid-column: 1 / -1; }
+  .grid2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Olist retention interventions</h1>
+    <p>Who to email, when to email them, which sellers are hurting delivery, and who goes into the voucher test. Every figure comes from the dbt marts in this project, built on the full Olist export. <span id="snapshot"></span></p>
+    <nav class="links">
+      <a href="docs/">Model docs and lineage graph</a>
+      <a href="https://github.com/JoshuaPaul-lasisi/retention-intervention-analytics">dbt project on GitHub</a>
+      <a href="https://github.com/JoshuaPaul-lasisi/olist-customer-retention">The Olist retention analysis</a>
+    </nav>
+  </header>
+
+  <section class="tiles" id="tiles" aria-label="Headline figures"></section>
+
+  <section class="card">
+    <h2>Who to email: 180-day repeat rate by first-order category</h2>
+    <p class="sub">Customers whose first order was at least 180 days before the snapshot, categories with 1,000 or more of them. Whiskers are 95% intervals. Blue categories return at 1.2 times the overall rate or better and get the follow-up email.</p>
+    <div class="legend"><span><i style="background:var(--series-1)"></i>High propensity</span><span><i style="background:var(--context)"></i>Other categories</span><span><i class="line"></i>All categories</span></div>
+    <div class="chart" id="c-propensity"></div>
+    <details><summary>Table view</summary><div class="scroll" id="t-propensity"></div></details>
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>When to email: days from first to second purchase</h2>
+      <p class="sub">Days. Bars span the middle half of returning buyers (25th to 75th percentile); the dot is the median. Buyers back within 180 days, categories with 30 or more of them.</p>
+      <div class="legend"><span><i style="background:var(--series-1)"></i>High propensity</span><span><i style="background:var(--context)"></i>Other categories</span><span><i class="dot" style="background:var(--text-secondary)"></i>All categories</span></div>
+      <div class="chart" id="c-timing"></div>
+      <p class="callout" id="timing-note"></p>
+      <details><summary>Table view</summary><div class="scroll" id="t-timing"></div></details>
+    </section>
+
+    <section class="card">
+      <h2>Voucher test: who is eligible, and what it can detect</h2>
+      <p class="sub">First order in a high-propensity category, no repeat yet, inside the category's timing window at the snapshot.</p>
+      <div class="chart" id="c-voucher"></div>
+      <h2 style="margin-top:18px">Smallest lift the test can detect</h2>
+      <p class="sub">Repeat rate within 60 days. 80% power, 5% two-sided.</p>
+      <div class="legend"><span><i class="dot" style="background:var(--context)"></i>Baseline without a voucher</span><span><i class="dot" style="background:var(--series-1)"></i>Smallest detectable rate</span></div>
+      <div class="chart" id="c-power"></div>
+      <p class="callout" id="power-note"></p>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Which sellers hurt the experience: deliveries more than three days late</h2>
+    <p class="sub">Share of delivered orders, by purchase month. Past three days late, 60% or more of customers leave one or two stars.</p>
+    <div class="chart" id="c-delivery"></div>
+    <p class="callout">August 2018 reads low: many of its orders had not been delivered when the export was taken, and only delivered orders count.</p>
+    <details><summary>Table view</summary><div class="scroll" id="t-delivery"></div></details>
+    <h2 style="margin-top:22px">Sellers with the highest late rate, June to August 2018</h2>
+    <p class="sub">Sellers with 30 or more delivered orders in those three months.</p>
+    <div class="scroll" id="t-sellers"></div>
+  </section>
+
+  <footer>
+    Data: Brazilian E-Commerce Public Dataset by Olist, CC BY-NC-SA 4.0. Values in Brazilian reais. The page is rebuilt from the dbt marts on every push to main.
+  </footer>
+</div>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  const NS = "http://www.w3.org/2000/svg";
+  const pct = (v, d = 1) => (v * 100).toFixed(d) + "%";
+  const int = v => Math.round(v).toLocaleString("en-GB");
+  const brl = v => v >= 1e6 ? "R$" + (v / 1e6).toFixed(1) + "M" : v >= 1e3 ? "R$" + (v / 1e3).toFixed(1) + "k" : "R$" + Math.round(v);
+  const nice = s => s === "all_categories" ? "All categories" : s.replace(/_/g, " ").replace(/^./, c => c.toUpperCase());
+  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const monthName = iso => new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { month: "short", year: "numeric", timeZone: "UTC" });
+
+  function el(tag, attrs, parent) {
+    const node = document.createElementNS(NS, tag);
+    for (const k in attrs) node.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+  function text(parent, x, y, str, cls, anchor) {
+    const t = el("text", { x, y, class: cls || "", "text-anchor": anchor || "start" }, parent);
+    t.textContent = str;
+    return t;
+  }
+  function svgFor(container, height) {
+    container.textContent = "";
+    const width = Math.max(300, container.clientWidth);
+    const svg = el("svg", { viewBox: `0 0 ${width} ${height}`, role: "img" }, container);
+    return { svg, width };
+  }
+  // Bar with a 4px rounded data end and a square baseline end.
+  function hbar(parent, x0, x1, y, h, fill) {
+    const w = Math.max(0, x1 - x0), r = Math.min(4, w, h / 2);
+    const d = `M${x0},${y} H${x0 + w - r} Q${x0 + w},${y} ${x0 + w},${y + r} V${y + h - r} Q${x0 + w},${y + h} ${x0 + w - r},${y + h} H${x0} Z`;
+    return el("path", { d, fill, class: "mark" }, parent);
+  }
+
+  // Width of the widest row label, so the label column never clips.
+  function labelColumn(svg, labels, width) {
+    const probe = el("text", { class: "rowlabel", x: 0, y: -100 }, svg);
+    let max = 0;
+    labels.forEach(l => { probe.textContent = l; max = Math.max(max, probe.getComputedTextLength()); });
+    svg.removeChild(probe);
+    return Math.min(Math.ceil(max) + 10, width * 0.5);
+  }
+
+  const tip = document.getElementById("tip");
+  function showTip(evt, title, rows) {
+    tip.textContent = "";
+    const t = document.createElement("div"); t.className = "t"; t.textContent = title; tip.appendChild(t);
+    rows.forEach(([label, value, color]) => {
+      const r = document.createElement("div"); r.className = "r";
+      const k = document.createElement("span"); k.className = "k";
+      if (color) { const i = document.createElement("i"); i.style.background = color; k.appendChild(i); }
+      k.appendChild(document.createTextNode(label));
+      const b = document.createElement("b"); b.textContent = value;
+      r.appendChild(k); r.appendChild(b); tip.appendChild(r);
+    });
+    tip.style.display = "block";
+    let x, y;
+    if (evt.clientX !== undefined && evt.type !== "focus") { x = evt.clientX; y = evt.clientY; }
+    else { const b = evt.target.getBoundingClientRect(); x = b.left + b.width / 2; y = b.top; }
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.min(window.innerWidth - tw - 8, Math.max(8, x + 14)) + "px";
+    tip.style.top = Math.max(8, (y - th - 12 < 8 ? y + 18 : y - th - 12)) + "px";
+  }
+  const hideTip = () => { tip.style.display = "none"; };
+  function bindTip(node, title, rows) {
+    node.setAttribute("tabindex", "0");
+    node.setAttribute("aria-label", title + ": " + rows.map(r => r[0] + " " + r[1]).join(", "));
+    node.addEventListener("pointermove", e => showTip(e, title, rows));
+    node.addEventListener("focus", e => showTip(e, title, rows));
+    node.addEventListener("pointerleave", hideTip);
+    node.addEventListener("blur", hideTip);
+  }
+
+  function table(container, headers, rows) {
+    container.textContent = "";
+    const t = document.createElement("table");
+    const tr = document.createElement("tr");
+    headers.forEach(([h, numeric]) => { const th = document.createElement("th"); th.textContent = h; if (numeric) th.className = "n"; tr.appendChild(th); });
+    const thead = document.createElement("thead"); thead.appendChild(tr); t.appendChild(thead);
+    const tbody = document.createElement("tbody");
+    rows.forEach(r => {
+      const row = document.createElement("tr");
+      r.forEach((v, i) => { const td = document.createElement("td"); td.textContent = v; if (headers[i][1]) td.className = "n"; row.appendChild(td); });
+      tbody.appendChild(row);
+    });
+    t.appendChild(tbody); container.appendChild(t);
+  }
+
+  function ticks(max, count) {
+    const raw = max / count, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= raw);
+    const out = []; for (let v = 0; v <= max + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+
+  function tiles(d) {
+    const k = d.kpis, box = document.getElementById("tiles");
+    const items = [
+      ["180-day repeat rate", pct(k.repeat_rate_180d, 2), int(k.observed_customers) + " customers observed for 180 days", true],
+      ["Customers", int(k.customers), "people with a completed order, Jan 2017 to Aug 2018"],
+      ["Repeat buyers", int(k.repeat_buyers), "bought again on a later day"],
+      ["Delivered 3+ days late", pct(k.late_delivery_rate), "of delivered orders"],
+      ["Voucher test eligible", int(k.voucher_eligible), "customers at the snapshot"],
+    ];
+    box.textContent = "";
+    items.forEach(([label, value, note, hero]) => {
+      const t = document.createElement("div"); t.className = "tile" + (hero ? " hero" : "");
+      [["label", label], ["value", value], ["note", note]].forEach(([c, s]) => {
+        const n = document.createElement("div"); n.className = c; n.textContent = s; t.appendChild(n);
+      });
+      box.appendChild(t);
+    });
+  }
+
+  function propensity(d) {
+    const rows = d.categories, overall = rows[0].overall_repeat_rate;
+    const c = document.getElementById("c-propensity");
+    const rowH = 24, top = 22, bottom = 26;
+    const { svg, width } = svgFor(c, top + rows.length * rowH + bottom);
+    const left = labelColumn(svg, rows.map(r => nice(r.first_order_category)), width), right = 46;
+    const max = Math.max(...rows.map(r => r.repeat_rate_ci_high)) * 1.05;
+    const x = v => left + (v / max) * (width - left - right);
+    const h = top + rows.length * rowH;
+    ticks(max, 5).forEach(t => {
+      el("line", { x1: x(t), x2: x(t), y1: top - 4, y2: h, stroke: css("--grid"), "stroke-width": 1 }, svg);
+      text(svg, x(t), h + 16, pct(t, t * 100 % 1 ? 1 : 0), "tick", "middle");
+    });
+    el("line", { x1: left, x2: left, y1: top - 4, y2: h, stroke: css("--axis"), "stroke-width": 1 }, svg);
+    rows.forEach((r, i) => {
+      const y = top + i * rowH, g = el("g", { class: "row" }, svg);
+      const fill = r.is_high_propensity ? css("--series-1") : css("--context");
+      text(g, left - 8, y + rowH / 2 + 4, nice(r.first_order_category), "rowlabel", "end");
+      hbar(g, left, x(r.repeat_rate), y + 5, 14, fill);
+      el("line", { x1: x(r.repeat_rate_ci_low), x2: x(r.repeat_rate_ci_high), y1: y + 12, y2: y + 12, stroke: css("--text-secondary"), "stroke-width": 1 }, g);
+      [r.repeat_rate_ci_low, r.repeat_rate_ci_high].forEach(v => el("line", { x1: x(v), x2: x(v), y1: y + 8, y2: y + 16, stroke: css("--text-secondary"), "stroke-width": 1 }, g));
+      text(g, width - 2, y + rowH / 2 + 4, pct(r.repeat_rate), "vlabel", "end");
+      const hit = el("rect", { x: 0, y, width, height: rowH, class: "hit" }, g);
+      bindTip(hit, nice(r.first_order_category), [
+        ["Repeat rate", pct(r.repeat_rate, 2), fill],
+        ["95% interval", pct(r.repeat_rate_ci_low, 1) + " to " + pct(r.repeat_rate_ci_high, 1)],
+        ["Lift vs all", r.lift_vs_overall.toFixed(2) + "x"],
+        ["Customers", int(r.observed_buyers)],
+      ]);
+    });
+    el("line", { x1: x(overall), x2: x(overall), y1: top - 6, y2: h, stroke: css("--text-secondary"), "stroke-width": 1.5 }, svg);
+    text(svg, x(overall), top - 10, "All categories " + pct(overall, 2), "annot", "middle");
+    table(document.getElementById("t-propensity"),
+      [["Category"], ["Customers", 1], ["Back within 180 days", 1], ["Repeat rate", 1], ["95% interval", 1], ["Lift", 1], ["Email"]],
+      rows.map(r => [nice(r.first_order_category), int(r.observed_buyers), int(r.repeat_buyers_within_window), pct(r.repeat_rate, 2),
+        pct(r.repeat_rate_ci_low, 1) + " to " + pct(r.repeat_rate_ci_high, 1), r.lift_vs_overall.toFixed(2) + "x", r.is_high_propensity ? "Yes" : "No"]));
+  }
+
+  function timing(d) {
+    const high = new Set(d.categories.filter(r => r.is_high_propensity).map(r => r.first_order_category));
+    const rows = d.timing;
+    const c = document.getElementById("c-timing");
+    const rowH = 24, top = 6, bottom = 26;
+    const { svg, width } = svgFor(c, top + rows.length * rowH + bottom);
+    const left = labelColumn(svg, rows.map(r => nice(r.first_order_category)), width), right = 12, max = 140;
+    const x = v => left + (Math.min(v, max) / max) * (width - left - right);
+    const h = top + rows.length * rowH;
+    const tstep = (width - left - right) / 7 < 34 ? 40 : 20;
+    for (let t = 0; t <= max; t += tstep) {
+      el("line", { x1: x(t), x2: x(t), y1: top, y2: h, stroke: css("--grid"), "stroke-width": 1 }, svg);
+      text(svg, x(t), h + 16, String(t), "tick", "middle");
+    }
+    rows.forEach((r, i) => {
+      const y = top + i * rowH, g = el("g", { class: "row" }, svg);
+      const all = r.first_order_category === "all_categories";
+      const fill = all ? css("--text-secondary") : high.has(r.first_order_category) ? css("--series-1") : css("--context");
+      const lbl = text(g, left - 8, y + rowH / 2 + 4, nice(r.first_order_category), "rowlabel", "end");
+      if (all) lbl.setAttribute("font-weight", "650");
+      const x0 = x(r.p25_days_to_repeat), x1 = x(r.p75_days_to_repeat);
+      el("rect", { x: x0, y: y + 8, width: Math.max(2, x1 - x0), height: 8, rx: 4, fill, opacity: all ? 0.35 : 0.45, class: "mark" }, g);
+      el("circle", { cx: x(r.median_days_to_repeat), cy: y + 12, r: 5, fill, stroke: css("--surface-1"), "stroke-width": 2, class: "mark" }, g);
+      const hit = el("rect", { x: 0, y, width, height: rowH, class: "hit" }, g);
+      bindTip(hit, nice(r.first_order_category), [
+        ["Median", Math.round(r.median_days_to_repeat) + " days", fill],
+        ["Middle half", Math.round(r.p25_days_to_repeat) + " to " + Math.round(r.p75_days_to_repeat) + " days"],
+        ["Back within 30 days", pct(r.share_within_30_days, 0)],
+        ["Repeat buyers", int(r.repeat_buyers)],
+      ]);
+    });
+    const all = rows.find(r => r.first_order_category === "all_categories");
+    document.getElementById("timing-note").textContent =
+      `A quarter of returning buyers are back within ${Math.round(all.p25_days_to_repeat)} days and half within ${Math.round(all.median_days_to_repeat)}. ` +
+      `The mart's suggested send day is the 25th percentile, so the email lands before most natural repeats.`;
+    table(document.getElementById("t-timing"),
+      [["Category"], ["Repeat buyers", 1], ["25th pct", 1], ["Median", 1], ["75th pct", 1], ["Send day", 1]],
+      rows.map(r => [nice(r.first_order_category), int(r.repeat_buyers), Math.round(r.p25_days_to_repeat), Math.round(r.median_days_to_repeat),
+        Math.round(r.p75_days_to_repeat), Math.round(r.suggested_send_day)]));
+  }
+
+  function voucher(d) {
+    const rows = d.voucher.by_category;
+    const c = document.getElementById("c-voucher");
+    const rowH = 28, top = 4, bottom = 6;
+    const { svg, width } = svgFor(c, top + rows.length * rowH + bottom);
+    const left = labelColumn(svg, rows.map(r => nice(r.first_order_category)), width), right = 52;
+    const max = Math.max(...rows.map(r => r.eligible_customers));
+    const x = v => left + (v / max) * (width - left - right);
+    el("line", { x1: left, x2: left, y1: top, y2: top + rows.length * rowH, stroke: css("--axis"), "stroke-width": 1 }, svg);
+    rows.forEach((r, i) => {
+      const y = top + i * rowH, g = el("g", { class: "row" }, svg);
+      text(g, left - 8, y + rowH / 2 + 4, nice(r.first_order_category), "rowlabel", "end");
+      hbar(g, left, x(r.eligible_customers), y + 6, 16, css("--series-1"));
+      text(g, x(r.eligible_customers) + 6, y + rowH / 2 + 4, int(r.eligible_customers), "vlabel");
+      const hit = el("rect", { x: 0, y, width, height: rowH, class: "hit" }, g);
+      bindTip(hit, nice(r.first_order_category), [
+        ["Eligible", int(r.eligible_customers), css("--series-1")],
+        ["Days since first order", r.min_days + " to " + r.max_days],
+      ]);
+    });
+  }
+
+  function power(d) {
+    const ds = d.voucher.design, base = ds.baseline_rate_60d;
+    const rows = [
+      ["50/50 split", ds.split_50_50],
+      ["90/10 split", ds.split_90_10],
+    ];
+    const c = document.getElementById("c-power");
+    const rowH = 34, top = 4, bottom = 26;
+    const { svg, width } = svgFor(c, top + rows.length * rowH + bottom);
+    const left = labelColumn(svg, ["2,016 in holdout", "90/10 split"], width), right = 44, max = 0.03;
+    const x = v => left + (v / max) * (width - left - right);
+    const h = top + rows.length * rowH;
+    [0, 0.01, 0.02, 0.03].forEach(t => {
+      el("line", { x1: x(t), x2: x(t), y1: top, y2: h, stroke: css("--grid"), "stroke-width": 1 }, svg);
+      text(svg, x(t), h + 16, pct(t, 0), "tick", "middle");
+    });
+    rows.forEach(([name, s], i) => {
+      const y = top + i * rowH + rowH / 2, g = el("g", { class: "row" }, svg);
+      text(g, left - 8, y - 2, name, "rowlabel", "end");
+      text(g, left - 8, y + 12, int(s.holdout) + " in holdout", "tick", "end");
+      el("line", { x1: x(base), x2: x(s.min_detectable_rate), y1: y, y2: y, stroke: css("--axis"), "stroke-width": 2 }, g);
+      el("circle", { cx: x(base), cy: y, r: 5, fill: css("--context"), stroke: css("--surface-1"), "stroke-width": 2, class: "mark" }, g);
+      el("circle", { cx: x(s.min_detectable_rate), cy: y, r: 5, fill: css("--series-1"), stroke: css("--surface-1"), "stroke-width": 2, class: "mark" }, g);
+      text(g, x(s.min_detectable_rate) + 9, y + 4, pct(s.min_detectable_rate), "vlabel");
+      const hit = el("rect", { x: 0, y: y - rowH / 2, width, height: rowH, class: "hit" }, g);
+      bindTip(hit, name, [
+        ["Smallest detectable", pct(s.min_detectable_rate, 2), css("--series-1")],
+        ["Baseline", pct(base, 2), css("--context")],
+        ["Treatment / holdout", int(s.treatment) + " / " + int(s.holdout)],
+      ]);
+    });
+    document.getElementById("power-note").textContent =
+      `Without a voucher about ${pct(base, 1)} of these customers buy within 60 days. Even split evenly, the test only detects the voucher roughly doubling that. ` +
+      `A 10% holdout is too small to be worth running; pool monthly cohorts to measure anything smaller.`;
+  }
+
+  function delivery(d) {
+    const rows = d.delivery_monthly;
+    const c = document.getElementById("c-delivery");
+    const height = 240, top = 16, bottom = 28, left = 40, right = 16;
+    const { svg, width } = svgFor(c, height);
+    const max = 0.18;
+    const x = i => left + (i / (rows.length - 1)) * (width - left - right);
+    const y = v => top + (1 - v / max) * (height - top - bottom);
+    [0, 0.05, 0.10, 0.15].forEach(t => {
+      el("line", { x1: left, x2: width - right, y1: y(t), y2: y(t), stroke: t === 0 ? css("--axis") : css("--grid"), "stroke-width": 1 }, svg);
+      text(svg, left - 6, y(t) + 4, pct(t, 0), "tick", "end");
+    });
+    const step = Math.ceil(64 / ((width - left - right) / (rows.length - 1)));
+    rows.forEach((r, i) => { if (i % step === 0) text(svg, x(i), height - 8, monthName(r.order_month), "tick", "middle"); });
+    const pts = rows.map((r, i) => [x(i), y(r.late_delivery_rate)]);
+    el("path", { d: "M" + pts.map(p => p.join(",")).join(" L") + ` L${x(rows.length - 1)},${y(0)} L${x(0)},${y(0)} Z`, fill: css("--series-1-wash") }, svg);
+    el("path", { d: "M" + pts.map(p => p.join(",")).join(" L"), fill: "none", stroke: css("--series-1"), "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+    const peak = rows.reduce((a, r, i) => r.late_delivery_rate > rows[a].late_delivery_rate ? i : a, 0);
+    el("circle", { cx: pts[peak][0], cy: pts[peak][1], r: 4, fill: css("--series-1"), stroke: css("--surface-1"), "stroke-width": 2 }, svg);
+    text(svg, pts[peak][0] + 8, pts[peak][1] + 4, monthName(rows[peak].order_month) + ": " + pct(rows[peak].late_delivery_rate), "annot");
+    const cross = el("line", { y1: top, y2: y(0), stroke: css("--text-muted"), "stroke-width": 1, visibility: "hidden" }, svg);
+    const dot = el("circle", { r: 4, fill: css("--series-1"), stroke: css("--surface-1"), "stroke-width": 2, visibility: "hidden" }, svg);
+    const hit = el("rect", { x: left, y: top, width: width - left - right, height: height - top - bottom, class: "hit", tabindex: 0,
+      "aria-label": "Monthly late delivery rate. Use left and right arrow keys to step through months." }, svg);
+    let idx = rows.length - 1;
+    function show(i, evt) {
+      idx = Math.max(0, Math.min(rows.length - 1, i));
+      const r = rows[idx];
+      cross.setAttribute("x1", x(idx)); cross.setAttribute("x2", x(idx)); cross.setAttribute("visibility", "visible");
+      dot.setAttribute("cx", x(idx)); dot.setAttribute("cy", y(r.late_delivery_rate)); dot.setAttribute("visibility", "visible");
+      const fake = evt || { target: dot, type: "focus" };
+      showTip(fake, monthName(r.order_month), [
+        ["3+ days late", pct(r.late_delivery_rate), css("--series-1")],
+        ["On or before estimate", pct(r.on_time_rate)],
+        ["Delivered orders", int(r.delivered_orders)],
+        ["GMV", brl(r.gmv)],
+      ]);
+    }
+    function hide() { cross.setAttribute("visibility", "hidden"); dot.setAttribute("visibility", "hidden"); hideTip(); }
+    hit.addEventListener("pointermove", e => {
+      const b = svg.getBoundingClientRect(), sx = (e.clientX - b.left) * (width / b.width);
+      show(Math.round((sx - left) / ((width - left - right) / (rows.length - 1))), e);
+    });
+    hit.addEventListener("pointerleave", hide);
+    hit.addEventListener("focus", () => show(idx));
+    hit.addEventListener("blur", hide);
+    hit.addEventListener("keydown", e => {
+      if (e.key === "ArrowLeft") { show(idx - 1); e.preventDefault(); }
+      if (e.key === "ArrowRight") { show(idx + 1); e.preventDefault(); }
+    });
+    table(document.getElementById("t-delivery"),
+      [["Month"], ["Delivered", 1], ["3+ days late", 1], ["Late rate", 1], ["On time", 1], ["GMV", 1]],
+      rows.map(r => [monthName(r.order_month), int(r.delivered_orders), int(r.late_orders), pct(r.late_delivery_rate), pct(r.on_time_rate), brl(r.gmv)]));
+  }
+
+  function sellers(d) {
+    table(document.getElementById("t-sellers"),
+      [["Seller"], ["State"], ["Delivered", 1], ["Late rate", 1], ["Lifetime late rate", 1], ["Avg review", 1], ["GMV", 1]],
+      d.worst_sellers.map(r => [r.seller_id.slice(0, 8), r.seller_state, int(r.delivered_orders), pct(r.late_delivery_rate),
+        pct(r.lifetime_late_rate), r.avg_review_score.toFixed(2), brl(r.gmv)]));
+  }
+
+  let data;
+  function render() {
+    if (!data) return;
+    propensity(data); timing(data); voucher(data); power(data); delivery(data);
+  }
+  fetch("data.json").then(r => r.json()).then(d => {
+    data = d;
+    const snap = new Date(d.snapshot_date + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+    document.getElementById("snapshot").textContent = "Snapshot " + snap + ".";
+    tiles(d); sellers(d); render();
+  });
+  let t;
+  window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(render, 120); });
+  if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+})();
+</script>
+</body>
+</html>

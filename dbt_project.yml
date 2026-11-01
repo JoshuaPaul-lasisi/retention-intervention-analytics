@@ -1,5 +1,6 @@
 name: retention_intervention_analytics
 version: "1.0.0"
+require-dbt-version: "1.12.6"
 config-version: 2
 
 profile: retention_intervention_analytics
